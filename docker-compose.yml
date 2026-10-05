@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  reverse_proxy:
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - cluster_network
+    depends_on:
+      - server_alpha
+      - server_beta
+
+  server_alpha:
+    build: ./backend
+    environment:
+      - SERVER_ID=ALPHA_DOCKER_NODE
+      - PORT=8001
+    networks:
+      - cluster_network
+
+  server_beta:
+    build: ./backend
+    environment:
+      - SERVER_ID=BETA_DOCKER_NODE
+      - PORT=8002
+    networks:
+      - cluster_network
+
+networks:
+  cluster_network:
+    driver: bridge
