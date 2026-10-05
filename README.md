@@ -1,41 +1,24 @@
-# High-Availability Asynchronous API Gateway & Traffic Orchestrator
+# Asynchronous Layer-7 Proxy Gateway & Traffic Orchestrator
 
-A lightweight, production-grade Layer-7 API Gateway, Load Balancer, and Web Application Firewall (WAF) engineered completely from scratch in Python utilizing asynchronous socket multiplexing. Built to demonstrate low-level systems engineering, network routing topologies, and programmatic cybersecurity constraints without relying on external enterprise frameworks.
+A custom, low-level Layer-7 API Gateway, Load Balancer, and Web Application Firewall (WAF) engineered in Python using raw asynchronous socket pipelines. Designed to handle stateful concurrency, low-overhead active health checking, and baseline traffic isolation policies at the ingress interface without external networking packages.
 
-## 🚀 Key Architectural Features
+## Core Features
 
-* **Asynchronous Socket Multiplexing:** Utilizes Python's native `asyncio` event loop to handle concurrent traffic conduits streams seamlessly with zero-blocking CPU performance degradation.
-* **Health-Aware Load Balancing:** Implements a thread-safe Round-Robin routing matrix driven by an active background daemon executing continuous low-overhead TCP pings to automatically evict dead servers and restore recovering nodes.
-* **Inline Security Shielding (WAF):** Employs deep-packet heuristic checking to inspect Layer-7 payloads, instantly dropping requests carrying known malicious signatures (SQL Injection, XSS scripting patterns) or blacklisted security scraping user-agents.
-* **Dynamic Token Rate Limiting:** Mitigates Denial-of-Service (DoS) vectors by running an IP-based sliding window request tracker, automatically enforcing a `429 Too Many Requests` threshold constraint.
-* **Automated Cluster Orchestration:** Containerized via Docker & Docker-Compose to support immediate multi-node deployment, accompanied by a local development orchestration engine (`.bat`) for rapid local testing loops.
+* **Asynchronous Socket Concurrency:** Uses Python's native `asyncio` networking framework to pipe non-blocking data conduits concurrently.
+* **Round-Robin Load Balancing:** Features a state-aware load broker managed by an isolated background task tracking server health via active TCP handshakes.
+* **Layer-7 Content Firewall:** Analyzes inbound streams to isolate and drop requests carrying illegal payloads (SQLi / XSS footprints) or blacklisted script scanner user-agents.
+* **Sliding-Window Rate Limiter:** Features granular IP-based rate controls tracking client frequency bounds to yield clean `429 Too Many Requests` HTTP blocks.
+* **Dynamic Stream Assembly:** Safely reads dynamic multi-part streaming byte content by analyzing `Content-Length` fields prior to dispatch.
 
-## 📁 System Architecture & Directory Topology
+## Repository Layout
 
 ```text
-distributed-gateway/
-│
 ├── gateway/
-│   ├── core.py          # Asynchronous Layer-7 TCP Socket Engine
-│   ├── router.py        # Advanced Path Routing & Health Monitoring Daemon
-│   ├── middleware.py    # Security Firewall Engine & Token Rate Limiter
-│   └── Dockerfile       # Container blueprint for the Gateway node
-│
+│   ├── core.py          # Asynchronous Socket Transport Core
+│   ├── router.py        # Health Daemon & Load Balance Routing Strategy
+│   └── middleware.py    # Request Validation Filters & WAF Engine
 ├── backend/
-│   ├── microservice.py  # Asynchronous JSON application service target
-│   └── Dockerfile       # Container blueprint for application cluster nodes
-│
-├── docker-compose.yml   # Production container environment mesh layout
-└── launch.bat           # Automated development environment bootstrap script
+│   └── microservice.py  # Targeted application microservices (mock output)
+├── docker-compose.yml   # Multi-tier container configuration metrics
+└── launch.bat           # Environment bootstrapping verification script
 ```
-
-## 🛠️ Local Infrastructure Initialization
-
-To initialize the distributed environment grid locally on Windows, execute the automated bootstrap batch script from your command line or double-click the file in your workspace:
-
-```bash
-# Launch the cluster via the automated orchestrator
-launch.bat
-```
-
-The script automatically provisions environment parameters, binds structural nodes to assigned network ports (`8001` and `8002`), introduces initialization buffers, and ignites the core Proxy Gateway routing hub on `http://127.0.0.1:8080`.

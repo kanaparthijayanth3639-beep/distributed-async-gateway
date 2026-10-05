@@ -3,18 +3,17 @@ from collections import defaultdict
 
 class SecurityFirewall:
     def __init__(self):
-        # Common automated scanner bots we want to block instantly
+        # Target user-agents to intercept at ingress
         self.blacklist = ["sqlmap", "nikto", "nmap", "dirbuster"]
 
     def is_safe(self, payload: str) -> bool:
-        """Inspects raw packet text for common web vulnerabilities."""
+        """Evaluates inbound packet payload data for basic injection patterns."""
         raw_text = payload.lower()
         
-        # Quick check for obvious SQL injection or XSS scripting attempts
+        # Check for obvious SQLi or XSS patterns
         if "select " in raw_text or "union select" in raw_text or "<script>" in raw_text:
             return False
             
-        # Block unauthorized security scrapers
         for bot in self.blacklist:
             if f"user-agent: {bot}" in raw_text:
                 return False
@@ -27,11 +26,11 @@ class RateLimiter:
         self.traffic_logs = defaultdict(list)
 
     async def allow_request(self, ip_address) -> bool:
-        """Simple token bucket tracking to prevent basic DDoS floods."""
+        """Sliding window log architecture to track request velocity limits."""
         now = time.time()
         user_history = self.traffic_logs[ip_address]
 
-        # Clean out old timestamps outside our 60-second window
+        # Prune outdated logs outside current sliding timeline
         while user_history and user_history[0] < now - self.window:
             user_history.pop(0)
 
@@ -39,4 +38,4 @@ class RateLimiter:
             user_history.append(now)
             return True
             
-        return False  # Throttled!
+        return False

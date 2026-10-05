@@ -2,27 +2,23 @@ import asyncio
 import os
 import json
 
-# Grab network parameters dynamically from the operating environment variables
 SERVER_ID = os.getenv("SERVER_ID", "NODE_DEV_LOCAL")
 PORT = int(os.getenv("PORT", 8001))
 
 async def process_incoming_stream(reader, writer):
-    """Processes proxied gateway connections and serves data payloads."""
+    """Processes reverse-proxied request payloads and yields structured responses."""
     try:
-        # Read the incoming forward headers passed from our proxy engine
         await reader.read(4096)
         
-        # Human custom touch: Let's make it look like a real production data api response!
         mock_data = {
-            "status": "online",
-            "served_by": SERVER_ID,
-            "region": "hyd-west-1",
-            "message": "Cluster transaction completed successfully."
+            "status": "healthy",
+            "node_id": SERVER_ID,
+            "region": "local-cluster-1",
+            "execution_status": "success"
         }
         
         json_payload = json.dumps(mock_data, indent=2)
         
-        # Build standard HTTP/1.1 response string with our custom dataset
         http_response = (
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: application/json\r\n"
@@ -34,13 +30,13 @@ async def process_incoming_stream(reader, writer):
         writer.write(http_response.encode('utf-8'))
         await writer.drain()
     except Exception as e:
-        print(f"[ERROR] Microservice node transaction crashed: {e}")
+        print(f"Microservice transaction error: {e}")
     finally:
         writer.close()
 
 async def start_node():
     server = await asyncio.start_server(process_incoming_stream, '127.0.0.1', PORT)
-    print(f"[NODE STARTED] Microservice cluster server {SERVER_ID} active on port {PORT}...")
+    print(f"Application node {SERVER_ID} bound to port {PORT}")
     
     async with server:
         await server.serve_forever()
